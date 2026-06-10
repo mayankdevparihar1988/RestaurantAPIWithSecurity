@@ -1,4 +1,5 @@
 using AutoMapper;
+using Restaurant.API.Middlewares;
 using Restaurants.Application.Extensions;
 using Restaurants.Infrastructure.Extensions;
 using Restaurants.Infrastructure.Seeders;
@@ -18,6 +19,9 @@ public class Program
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+        
+        // Register Error Handling Middelware
+        builder.Services.AddScoped<ErrorHandlingMiddleware>();
         // Adding Database context dependancy
         builder.Services.AddRestaurantDbContext(builder.Configuration);
         builder.Services.AddApplication();
@@ -49,11 +53,20 @@ public class Program
         }
 
         app.UseHttpsRedirection();
-
+        
+       
+       
         app.UseAuthorization();
 
 
         app.MapControllers();
+        
+        // Configure the HTTP request pipeline.
+        app.UseMiddleware<ErrorHandlingMiddleware>();
+        
+        // Configure request loggin using serilogs
+        app.UseSerilogRequestLogging();
+
 
         app.Run();
     }

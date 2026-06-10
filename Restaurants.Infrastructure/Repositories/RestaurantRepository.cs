@@ -23,7 +23,7 @@ public class RestaurantRepository(RestaurantDbContext dbContext, ILogger<Restaur
 
     public async Task<Restaurant?> GetRestaurantByIdAsync(int restaurantId, CancellationToken cancellationToken)
     {
-        if (restaurantId == 0)
+        if (restaurantId == 0 ||  restaurantId == null)
         {
             return null;
         }
