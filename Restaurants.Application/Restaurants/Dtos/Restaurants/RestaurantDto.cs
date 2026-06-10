@@ -1,5 +1,6 @@
 using Restaurants.Application.Restaurants.Dtos.Dishes;
 using Restaurants.Domain.Entities;
+using static Restaurants.Application.Restaurants.Dtos.Dishes.DishDto;
 
 namespace Restaurants.Application.Restaurants.Dtos;
 
@@ -13,7 +14,7 @@ public class RestaurantDto
     public string? City { get; set; }
     public string? Street { get; set; }
     public string? PostalCode { get; set; }
-    public string? LogoSasUrl { get; set; }
+    //public string? LogoSasUrl { get; set; }
 
     public List<DishDto> Dishes { get; set; } = [];
 
@@ -23,7 +24,7 @@ public class RestaurantDto
         {
             return new RestaurantDto();
         }
-        
+
         return new RestaurantDto
         {
             Id = restaurant.Id,
@@ -34,7 +35,7 @@ public class RestaurantDto
             City = restaurant.Address?.City,
             Street = restaurant.Address?.Street,
             PostalCode = restaurant.Address?.PostalCode,
-
+            Dishes = restaurant.Dishes.Select(DishDto.FromEntity).ToList(),
         };
     }
 }

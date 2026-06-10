@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Restaurants.Domain.Entities;
@@ -27,7 +28,40 @@ public class RestaurantRepository(RestaurantDbContext dbContext, ILogger<Restaur
             return null;
         }
         
-        var result = await DbContext.Restaurants.FirstOrDefaultAsync(r => r.Id == restaurantId, cancellationToken);
+        var result = await DbContext.Restaurants.Include(r=> r.Dishes)
+            .FirstOrDefaultAsync(r => r.Id == restaurantId, cancellationToken);
         return result;
     }
-}
+
+    public async Task<int?> CreateRestaurantAsync(Restaurant? restaurant, CancellationToken cancellationToken)
+    {
+        if (restaurant is null)
+        {
+            return null;
+        }
+        
+        var result = await DbContext.Restaurants.AddAsync(restaurant, cancellationToken);
+        
+        await  DbContext.SaveChangesAsync(cancellationToken);
+        return result.Entity.Id;
+    }
+
+    public async Task<bool> UpdateRestaurant(Restaurant? restaurant, CancellationToken cancellationToken)
+    {
+        if (restaurant is null)
+        {
+            return false;
+        }
+        
+        var result =  DbContext.Restaurants.Update(restaurant);
+        
+        await  DbContext.SaveChangesAsync(cancellationToken);
+        return true;
+        
+    }
+
+    public async Task<int> SaveAsync(CancellationToken cancellationToken)
+    {
+        return await DbContext.SaveChangesAsync(cancellationToken);
+    }
+}   

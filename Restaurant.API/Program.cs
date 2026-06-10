@@ -1,6 +1,8 @@
+using AutoMapper;
 using Restaurants.Application.Extensions;
 using Restaurants.Infrastructure.Extensions;
 using Restaurants.Infrastructure.Seeders;
+using Serilog;
 
 namespace Restaurant.API;
 
@@ -19,6 +21,12 @@ public class Program
         // Adding Database context dependancy
         builder.Services.AddRestaurantDbContext(builder.Configuration);
         builder.Services.AddApplication();
+        
+        // Using Serilogs
+        builder.Host.UseSerilog((context, configuration) =>
+            configuration.ReadFrom.Configuration(context.Configuration)
+        );
+
 
         var app = builder.Build();
         
@@ -26,9 +34,13 @@ public class Program
         // As IRestaurantSeeder is an scoped service so we get it from dependency injection and run it
         var scope = app.Services.CreateScope();
         var seeder = scope.ServiceProvider.GetRequiredService<IRestaurantSeeder>();
-
+        // Calling db seeding
         await seeder.Seed();
-
+        
+        // get automapper and validate if mapping configuration is missing
+        var mapper =  scope.ServiceProvider.GetRequiredService<IMapper>();
+        mapper.ConfigurationProvider.AssertConfigurationIsValid();
+        
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
