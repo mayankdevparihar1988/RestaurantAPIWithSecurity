@@ -22,6 +22,8 @@ public class Program
         
         // Register Error Handling Middelware
         builder.Services.AddScoped<ErrorHandlingMiddleware>();
+        builder.Services.AddScoped<RequestTimeLoggingMiddleware>();
+        
         // Adding Database context dependancy
         builder.Services.AddRestaurantDbContext(builder.Configuration);
         builder.Services.AddApplication();
@@ -63,6 +65,7 @@ public class Program
         
         // Configure the HTTP request pipeline.
         app.UseMiddleware<ErrorHandlingMiddleware>();
+        app.UseMiddleware<RequestTimeLoggingMiddleware>();
         
         // Configure request loggin using serilogs
         app.UseSerilogRequestLogging();

@@ -18,5 +18,6 @@ public static class ServiceCollectionExtension
         services.AddDbContext<RestaurantDbContext>(options => options.UseSqlServer(connectionString).EnableSensitiveDataLogging());
         services.AddScoped<IRestaurantSeeder, RestaurantSeeder>();
         services.AddScoped<IRestaurantRepository, RestaurantRepository>();
+        services.AddScoped<IDishesRepository, DishesRepository>();
     }
 }

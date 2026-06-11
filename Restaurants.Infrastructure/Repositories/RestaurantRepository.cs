@@ -28,8 +28,10 @@ public class RestaurantRepository(RestaurantDbContext dbContext, ILogger<Restaur
             return null;
         }
         
-        var result = await DbContext.Restaurants.Include(r=> r.Dishes)
-            .FirstOrDefaultAsync(r => r.Id == restaurantId, cancellationToken);
+        var result = await dbContext.Restaurants
+            .Include(r => r.Dishes)
+            .FirstOrDefaultAsync(x => x.Id == restaurantId, cancellationToken: cancellationToken);
+
         return result;
     }
 
