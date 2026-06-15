@@ -1,6 +1,8 @@
 using AutoMapper;
+using Microsoft.OpenApi.Models;
 using Restaurant.API.Middlewares;
 using Restaurants.Application.Extensions;
+using Restaurants.Domain.Entities;
 using Restaurants.Infrastructure.Extensions;
 using Restaurants.Infrastructure.Seeders;
 using Serilog;
@@ -18,7 +20,29 @@ public class Program
         builder.Services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+        
+        builder.Services.AddSwaggerGen(c =>
+        {
+            c.AddSecurityDefinition("bearerAuth", new OpenApiSecurityScheme
+            {
+                Type = SecuritySchemeType.Http,
+                Scheme = "Bearer"
+            });
+
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                { 
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "bearerAuth"}
+                    },
+                    []
+                }
+
+            });
+        });
+
+        
         
         // Register Error Handling Middelware
         builder.Services.AddScoped<ErrorHandlingMiddleware>();
@@ -56,12 +80,16 @@ public class Program
 
         app.UseHttpsRedirection();
         
-       
-       
         app.UseAuthorization();
 
-
         app.MapControllers();
+        
+        // Enable the Identity api in the app, we do it after other controller
+        app.MapGroup("api/identity").MapIdentityApi<User>();
+        
+        // TEST USER
+        // "email": "mayank.dev.parihar@gmail.com",
+        // "password": "Mayank@123"
         
         // Configure the HTTP request pipeline.
         app.UseMiddleware<ErrorHandlingMiddleware>();
