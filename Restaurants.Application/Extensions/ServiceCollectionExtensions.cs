@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Restaurants.Application.Restaurants;
 using Restaurants.Application.Restaurants.Commands.CreateRestaurant;
 using Restaurants.Application.Restaurants.Dtos.Restaurants;
+using Restaurants.Application.Users;
 
 namespace Restaurants.Application.Extensions;
 
@@ -35,6 +36,11 @@ public static class ServiceCollectionExtensions
         services.AddFluentValidationAutoValidation();
         // Registering the mediator 
         services.AddMediatR(cnf => cnf.RegisterServicesFromAssembly(assembly));
+        // Registering the UserContext Service
+        services.AddScoped<IUserContext, UserContext>();
+        
+        // This we need to register so that it can be accessed in UserContext
+        services.AddHttpContextAccessor();
 
     }
 }
